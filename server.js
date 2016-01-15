@@ -1,6 +1,6 @@
 var zkLib       = require('./lib/ZooKeeper.js');
 var kafkaLib    = require('./lib/Kafka.js');
-var cache       = require('./lib/Cache.js').cache;
+var cache       = require('./lib/Cache.js');
 var logger      = require('./logger.js').logger;
 var config      = require('./config');
 var express     = require('express');
@@ -11,20 +11,23 @@ var loadMonitorData = function() {
     logger.trace('loading consumer metadata');
     return zkLib
         .loadConsumerMetaData()
-        .then(kafkaLib.getTopicOffsets);
+        .then(kafkaLib.getTopicOffsets)
+        .then(function() {
+            cache
+                .getContents()
+                .then(function(result){
+                    logger.info(result.items);
+                });
+        })
+        .then(function() {
+            setTimeout(function() {
+                loadMonitorData();
+            }, config.refreshInterval);
+        });
 };
 
-var pollMetadata = function() {
-    setTimeout(function() {
-        logger.debug('polling the latest metadata');
-        loadMonitorData()
-        .then(pollMetadata);
-    }, config.refreshInterval);
-};
-
-
-loadMonitorData()
-    .then(pollMetadata);
+// set a delay to stop zk throwing errors from us trying to connect to quickly
+setTimeout(loadMonitorData, 1000);
 
 // CORS headers for external access from JS
 app.use(function(req, res, next) {
