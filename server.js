@@ -27,7 +27,7 @@ var loadMonitorData = function() {
 };
 
 // set a delay to stop zk throwing errors from us trying to connect to quickly
-setTimeout(loadMonitorData, 1000);
+loadMonitorData();
 
 // CORS headers for external access from JS
 app.use(function(req, res, next) {
@@ -60,7 +60,7 @@ app.get('/consumergroups', function(req, res){
 
 
 app.get('/consumers/:consumer/lag', function(req, res) {
-    var consumer = req.params.consumer; 
+    var consumer = req.params.consumer;
 
     cache.get(consumer, function(err, value){
         if (!err) {
