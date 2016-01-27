@@ -16,7 +16,7 @@ var loadMonitorData = function() {
             cache
                 .getContents()
                 .then(function(result){
-                    logger.info(result.items);
+                    logger.info(result.items, "consumer lags");
                 });
         })
         .then(function() {
