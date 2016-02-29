@@ -1,4 +1,5 @@
 {
+    "zkConnect": "fbruxprapzoo01:2181,fbruxprapzoo02:2181,fbruxprapzoo03:2181,sdcuxprapzoo01:2181,sdcuxprapzoo02:2181",
     "logging": {
         "stdout": {
             "enabled": false
@@ -8,6 +9,8 @@
             "level": "info",
             "enabled": true
         }
+    },
+    "server": {
+        "port":80
     }
-
 }
