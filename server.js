@@ -3,6 +3,7 @@ var kafkaLib    = require('./lib/Kafka.js');
 var cache       = require('./lib/Cache.js');
 var logger      = require('./logger.js').logger;
 var config      = require('./config');
+var eventEmitter = require('events');
 var express     = require('express');
 var Promise     = require('promise');
 var app         = express();
@@ -28,6 +29,14 @@ var loadMonitorData = function() {
 
 // set a delay to stop zk throwing errors from us trying to connect to quickly
 loadMonitorData();
+
+// the zookeeper session has expired, we need to stop the application and let the systemd
+// restart the application for a clean restart
+var emitter     = new eventEmitter();
+emitter.on('session_expired', function() {
+    process.exit(15);
+});
+
 
 // CORS headers for external access from JS
 app.use(function(req, res, next) {
